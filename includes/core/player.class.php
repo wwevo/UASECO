@@ -410,12 +410,12 @@ class Player extends BaseClass {
 		global $aseco;
 
 		// Updates without required handlings
-		$this->nickname	= $info['NickName'];
-		$this->teamid	= $info['TeamId'];
+		$this->nickname	= isset($info['NickName']) ? $info['NickName'] : null;
+		$this->teamid	= isset($info['TeamId']) ? $info['TeamId'] : null;
 
 		// Check LadderRanking
-		if ($info['LadderRanking'] > 0) {
-			$this->ladder_rank = $info['LadderRanking'];
+		if (isset($info['LadderRanking']) && $info['LadderRanking'] > 0) {
+			$this->ladder_rank = isset($info['LadderRanking']) ? $info['LadderRanking'] : null;
 			$this->is_official = true;
 		}
 		else {
@@ -423,22 +423,24 @@ class Player extends BaseClass {
 		}
 
 		// Based upon https://github.com/maniaplanet/dedicated-server-api/blob/master/libraries/Maniaplanet/DedicatedServer/Structures/PlayerInfo.php
-		$this->is_referee			= (bool)(intval($info['Flags'] / 10) % 10);
-		$this->is_podium_ready			= (bool)(intval($info['Flags'] / 100) % 10);
-		$this->is_using_stereoscopy		= (bool)(intval($info['Flags'] / 1000) % 10);
-		$this->is_managed_by_other_server	= (bool)(intval($info['Flags'] / 10000) % 10);
-		$this->is_server			= (bool)(intval($info['Flags'] / 100000) % 10);
-		$this->has_player_slot			= (bool)(intval($info['Flags'] / 1000000) % 10);
-		$this->is_broadcasting			= (bool)(intval($info['Flags'] / 10000000) % 10);
-		$this->has_joined_game			= (bool)(intval($info['Flags'] / 100000000) % 10);
+		$this->is_referee			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 10) % 10) : false;
+		$this->is_podium_ready			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 100) % 10) : false;
+		$this->is_using_stereoscopy		= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 1000) % 10) : false;
+		$this->is_managed_by_other_server	= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 10000) % 10) : false;
+		$this->is_server			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 100000) % 10) : false;
+		$this->has_player_slot			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 1000000) % 10) : false;
+		$this->is_broadcasting			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 10000000) % 10) : false;
+		$this->has_joined_game			= isset($info['Flags']) ? (bool)(intval($info['Flags'] / 100000000) % 10) : false;
 
-		$this->is_spectator			= (bool)($info['SpectatorStatus'] % 10);
-		$this->forced_spectator			= $info['Flags'] % 10;					// 0, 1 or 2
-		$this->temporary_spectator		= (bool)(intval($info['SpectatorStatus'] / 10) % 10);
-		$this->pure_spectator			= (bool)(intval($info['SpectatorStatus'] / 100) % 10);
+		$this->is_spectator			= isset($info['SpectatorStatus']) ? (bool)($info['SpectatorStatus'] % 10) : false;
 
-		$this->target_autoselect		= (bool)(intval($info['SpectatorStatus'] / 1000) % 10);
-		$target					= $aseco->server->players->getPlayerByPid(intval($info['SpectatorStatus'] / 10000));
+		$this->forced_spectator			= isset($info['Flags']) ? $info['Flags'] % 10 : 0; // 0, 1 or 2
+		$this->temporary_spectator		= isset($info['SpectatorStatus']) ? (bool)(intval($info['SpectatorStatus'] / 10) % 10) : false;
+		$this->pure_spectator			= isset($info['SpectatorStatus']) ? (bool)(intval($info['SpectatorStatus'] / 100) % 10) : false;
+
+		$this->target_autoselect		= isset($info['SpectatorStatus']) ? (bool)(intval($info['SpectatorStatus'] / 1000) % 10) : false;
+		$player_pid 					= isset($info['SpectatorStatus']) ? intval($info['SpectatorStatus'] / 10000) : null;
+		$target							= $aseco->server->players->getPlayerByPid($player_pid);
 		$this->target_spectating		= ((!$target) ? false : $target->login);
 	}
 
